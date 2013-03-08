@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+    <title>a code blog</title>
+    <link href="http://rdno.github.com/feeds/all.atom.xml"
+	type="application/atom+xml"
+	rel="alternate" title="a code blog Full Atom Feed" />
+            <link href="http://rdno.github.com/feeds/code.atom.xml"
+	type="application/atom+xml" rel="alternate"
+	title="a code blog Categories Atom Feed" />
+            <link rel="stylesheet" type="text/css"
+	href="./theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+  <header id="banner" class="body">
+    <h1><a href=".">a code blog</a></h1>
+      </header>
+  <section id="content" class="body">
+  <header>
+    <h2 class="entry-title">
+      <a href="volume-notifications-with-dbus.html" rel="bookmark"
+         title="Permalink to Volume Notifications with DBus">Volume Notifications with DBus</a></h2>
+  </header>
+  <footer class="post-info">
+  <i class="icon-calendar"></i>
+  <time title="2012-12-12T00:55:00" class="published" datetime="2012-12-12T00:55:00">Wed 12 December 2012</time>
+    &nbsp;<i class="icon-folder-close"></i>
+  <a class="category"
+     title="in category code"
+     href="./category/code.html">
+    code
+  </a>
+      &nbsp;<i class="icon-tags"></i>
+    <a class="tag"
+     title="tagged python"
+     href="./tag/python.html">python</a>
+    <a class="tag"
+     title="tagged dbus"
+     href="./tag/dbus.html">dbus</a>
+    <a class="tag"
+     title="tagged xmonad"
+     href="./tag/xmonad.html">xmonad</a>
+        </footer>  <div class="entry-content">
+    <p>I had been using <a href="https://launchpad.net/xfce4-volumed">xfce4-volumed</a> for volume control. But i decided go with vanilla xmonad. So, I added volume key shortcuts to my xmonad configuration:</p>
+<div class="codehilite"><pre><span class="o">...</span>
+<span class="p">,</span> <span class="p">(</span><span class="s">&quot;&lt;XF86AudioRaiseVolume&gt;&quot;</span><span class="p">,</span> <span class="n">spawn</span> <span class="s">&quot;NOTIFY=true ~/.xmonad/tools/vol -i 1&quot;</span><span class="p">)</span>
+<span class="p">,</span> <span class="p">(</span><span class="s">&quot;&lt;XF86AudioLowerVolume&gt;&quot;</span><span class="p">,</span> <span class="n">spawn</span> <span class="s">&quot;NOTIFY=true ~/.xmonad/tools/vol -d 1&quot;</span><span class="p">)</span>
+<span class="p">,</span> <span class="p">(</span><span class="s">&quot;&lt;XF86AudioMute&gt;&quot;</span><span class="p">,</span> <span class="n">spawn</span> <span class="s">&quot;NOTIFY=true ~/.xmonad/tools/vol -t&quot;</span><span class="p">)</span>
+<span class="o">...</span>
+</pre></div>
+
+
+<p>vol script is based on <a href="https://bbs.archlinux.org/viewtopic.php?id=46608">dvol</a></p>
+<div class="codehilite"><pre><span class="c">#!/bin/bash</span>
+
+<span class="nv">IF</span><span class="o">=</span><span class="s2">&quot;Master&quot;</span>
+<span class="nv">CARD</span><span class="o">=</span><span class="s2">&quot;-c 0&quot;</span>
+
+err<span class="o">()</span> <span class="o">{</span>
+  <span class="nb">echo</span> <span class="s2">&quot;$1&quot;</span>
+  <span class="nb">exit </span>1
+<span class="o">}</span>
+
+usage<span class="o">()</span> <span class="o">{</span>
+  <span class="nb">echo</span> <span class="s2">&quot;usage: dvol [option] [argument]&quot;</span>
+  <span class="nb">echo</span>
+<span class="nb">  echo</span> <span class="s2">&quot;Options:&quot;</span>
+  <span class="nb">echo</span> <span class="s2">&quot;     -i, --increase - increase volume by \`argument&#39;&quot;</span>
+  <span class="nb">echo</span> <span class="s2">&quot;     -d, --decrease - decrease volume by \`argument&#39;&quot;</span>
+  <span class="nb">echo</span> <span class="s2">&quot;     -t, --toggle   - toggle mute on and off&quot;</span>
+  <span class="nb">echo</span> <span class="s2">&quot;     -s, --show     - show volume&quot;</span>
+  <span class="nb">echo</span> <span class="s2">&quot;     -h, --help     - display this&quot;</span>
+  <span class="nb">exit</span>
+<span class="o">}</span>
+
+<span class="c">#Argument Parsing</span>
+<span class="k">case</span> <span class="s2">&quot;$1&quot;</span> in
+  <span class="s1">&#39;-i&#39;</span>|<span class="s1">&#39;--increase&#39;</span><span class="o">)</span>
+    <span class="o">[</span> -z <span class="s2">&quot;$2&quot;</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> err <span class="s2">&quot;No argument specified for increase.&quot;</span>
+    <span class="nv">AMIXARG</span><span class="o">=</span><span class="s2">&quot;${2}%+&quot;</span>
+    ;;
+  <span class="s1">&#39;-d&#39;</span>|<span class="s1">&#39;--decrease&#39;</span><span class="o">)</span>
+    <span class="o">[</span> -z <span class="s2">&quot;$2&quot;</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> err <span class="s2">&quot;No argument specified for decrease.&quot;</span>
+    <span class="nv">AMIXARG</span><span class="o">=</span><span class="s2">&quot;${2}%-&quot;</span>
+    ;;
+  <span class="s1">&#39;-t&#39;</span>|<span class="s1">&#39;--toggle&#39;</span><span class="o">)</span>
+    <span class="nv">AMIXARG</span><span class="o">=</span><span class="s2">&quot;toggle&quot;</span>
+    <span class="nv">CARD</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+    ;;
+  <span class="s1">&#39;&#39;</span>|<span class="s1">&#39;-s&#39;</span>|<span class="s1">&#39;--show&#39;</span><span class="o">)</span>
+    <span class="nv">AMIXARG</span><span class="o">=</span><span class="s2">&quot;show&quot;</span>
+    ;;
+  <span class="s1">&#39;-h&#39;</span>|<span class="s1">&#39;--help&#39;</span><span class="o">)</span>
+    usage
+    ;;
+  *<span class="o">)</span>
+    err <span class="s2">&quot;Unrecognized option \`$1&#39;, see dvol --help&quot;</span>
+    ;;
+<span class="k">esac</span>
+<span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;$AMIXARG&quot;</span> !<span class="o">=</span> <span class="s2">&quot;show&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+<span class="k">    </span><span class="nv">AMIXER</span><span class="o">=</span><span class="s2">&quot;$(amixer $CARD sset &quot;</span><span class="nv">$IF</span><span class="s2">&quot; &quot;</span><span class="nv">$AMIXARG</span><span class="s2">&quot;)&quot;</span>
+<span class="k">fi</span>
+<span class="nv">VOLUME</span><span class="o">=</span><span class="s2">&quot;$(amixer -c 0 sget &quot;</span><span class="nv">$IF</span><span class="s2">&quot; | tail -n 1 | cut -d &quot;</span> <span class="s2">&quot; -f 6 | cut -d &quot;</span><span class="o">]</span><span class="s2">&quot; -f 1 | cut -c2-6)&quot;</span>
+<span class="nv">MUTED</span><span class="o">=</span><span class="s2">&quot;$(amixer sget Master | tail -n 1 | cut -d &quot;</span> <span class="s2">&quot; -f 8)&quot;</span>
+<span class="k">if</span> <span class="o">[[</span> <span class="s2">&quot;$MUTED&quot;</span> <span class="o">==</span> <span class="s2">&quot;[off]&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+<span class="k">    </span><span class="nv">VOLUME</span><span class="o">=</span><span class="s2">&quot;Muted&quot;</span>
+<span class="k">fi</span>
+<span class="nb">echo</span> <span class="s2">&quot;Vol:&quot;</span> <span class="nv">$VOLUME</span>
+
+<span class="k">if</span> <span class="o">[[</span> <span class="nv">$NOTIFY</span> <span class="o">==</span> <span class="s2">&quot;true&quot;</span> <span class="o">]]</span>; <span class="k">then</span>
+    <span class="nv">$HOME</span>/.xmonad/tools/vol_notify.py <span class="nv">$VOLUME</span>
+<span class="k">fi</span>
+</pre></div>
+
+
+<p>At first, i tried to use <code>notify-send</code> but it was creating new notification for each invoke. Apparently, to update notification you need to know its id. I am using dbus to send notification to daemon and saving the id to a text file. Each time python script executed it reads the last id and send dbus message accordingly.</p>
+<div class="codehilite"><pre><span class="c">#!/usr/bin/python2</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="c">#author: Rıdvan Örsvuran</span>
+<span class="kn">import</span> <span class="nn">dbus</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">ID_FILE</span> <span class="o">=</span> <span class="s">&quot;/tmp/vol_notify.id&quot;</span>
+
+<span class="n">LOW_VOL</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">MED_VOL</span> <span class="o">=</span> <span class="mi">80</span>
+
+<span class="k">def</span> <span class="nf">get_id</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">ID_FILE</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">_id</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">_id</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">_id</span>
+
+<span class="k">def</span> <span class="nf">set_id</span><span class="p">(</span><span class="n">_id</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">ID_FILE</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">_id</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">get_icon</span><span class="p">(</span><span class="n">vol</span><span class="p">):</span>
+    <span class="n">icon</span> <span class="o">=</span> <span class="s">&#39;audio-volume-low&#39;</span>
+    <span class="k">if</span> <span class="n">vol</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">icon</span> <span class="o">=</span> <span class="s">&#39;audio-volume-muted&#39;</span>
+    <span class="k">elif</span> <span class="n">vol</span> <span class="o">&gt;</span> <span class="n">MED_VOL</span><span class="p">:</span>
+        <span class="n">icon</span> <span class="o">=</span> <span class="s">&#39;audio-volume-high&#39;</span>
+    <span class="k">elif</span> <span class="n">vol</span> <span class="o">&gt;</span> <span class="n">LOW_VOL</span><span class="p">:</span>
+        <span class="n">icon</span> <span class="o">=</span> <span class="s">&#39;audio-volume-medium&#39;</span>
+    <span class="k">return</span> <span class="n">icon</span>
+
+<span class="k">def</span> <span class="nf">notify_volume</span><span class="p">(</span><span class="n">vol</span><span class="p">):</span>
+    <span class="n">_id</span> <span class="o">=</span> <span class="n">get_id</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">vol</span> <span class="o">==</span> <span class="s">&quot;Muted&quot;</span><span class="p">:</span>
+        <span class="n">vol</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">vol</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">vol</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="c">#remove % sign</span>
+    <span class="n">bus</span> <span class="o">=</span> <span class="n">dbus</span><span class="o">.</span><span class="n">SessionBus</span><span class="p">()</span>
+    <span class="n">o</span> <span class="o">=</span> <span class="n">bus</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s">&#39;org.freedesktop.Notifications&#39;</span><span class="p">,</span>
+                       <span class="s">&#39;/org/freedesktop/Notifications&#39;</span><span class="p">)</span>
+    <span class="n">notify</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">get_dbus_method</span><span class="p">(</span><span class="s">&#39;Notify&#39;</span><span class="p">,</span> <span class="s">&#39;org.freedesktop.Notifications&#39;</span><span class="p">)</span>
+    <span class="n">_id</span> <span class="o">=</span> <span class="n">notify</span><span class="p">(</span><span class="s">&#39;Volume&#39;</span><span class="p">,</span> <span class="n">_id</span><span class="p">,</span> <span class="n">get_icon</span><span class="p">(</span><span class="n">vol</span><span class="p">),</span>
+                 <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{</span><span class="s">&#39;value&#39;</span><span class="p">:</span><span class="n">vol</span><span class="p">},</span> <span class="mi">3000</span><span class="p">)</span>
+    <span class="n">set_id</span><span class="p">(</span><span class="n">_id</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">:</span>
+        <span class="n">notify_volume</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+  </div><!-- /.entry-content -->
+</section>
+  <footer id="contentinfo" class="body">
+    <address id="about" class="vcard body">
+      Rıdvan Örsvuran |
+             License:&nbsp;<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png" /></a>
+            <br />
+      Theme: <a href="https://github.com/rdno/pelican-theme-solar">Solar Theme</a>
+      | Icons: <a href="http://fortawesome.github.com/Font-Awesome/">Font Awesome</a> |
+      Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+      which takes great advantage of <a href="http://python.org">Python</a>.
+    </address><!-- /#about -->
+  </footer><!-- /#contentinfo -->
+</body>
+</html>

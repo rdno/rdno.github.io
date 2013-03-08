@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+    <title>a code blog</title>
+    <link href="http://rdno.github.com/feeds/all.atom.xml"
+	type="application/atom+xml"
+	rel="alternate" title="a code blog Full Atom Feed" />
+            <link href="http://rdno.github.com/feeds/code.atom.xml"
+	type="application/atom+xml" rel="alternate"
+	title="a code blog Categories Atom Feed" />
+            <link rel="stylesheet" type="text/css"
+	href="./theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+  <header id="banner" class="body">
+    <h1><a href=".">a code blog</a></h1>
+      </header>
+  <section id="content" class="body">
+  <header>
+    <h2 class="entry-title">
+      <a href="getting-gmail-unread-count-using-atom-feed.html" rel="bookmark"
+         title="Permalink to Getting gmail unread count using atom feed">Getting gmail unread count using atom feed</a></h2>
+  </header>
+  <footer class="post-info">
+  <i class="icon-calendar"></i>
+  <time title="2012-12-13T17:17:00" class="published" datetime="2012-12-13T17:17:00">Thu 13 December 2012</time>
+    &nbsp;<i class="icon-folder-close"></i>
+  <a class="category"
+     title="in category code"
+     href="./category/code.html">
+    code
+  </a>
+      &nbsp;<i class="icon-tags"></i>
+    <a class="tag"
+     title="tagged python"
+     href="./tag/python.html">python</a>
+        </footer>  <div class="entry-content">
+    <p>Gmail provides an atom feed for unread mails. You need to login first, of course. I didn't want to store my password in plain text. So, i wrote function takes your username and password and encodes them and saves to a file.</p>
+<div class="codehilite"><pre><span class="k">def</span> <span class="nf">setup</span><span class="p">():</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">&#39;username:&#39;</span><span class="p">)</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getpass</span><span class="p">(</span><span class="s">&#39;password:&#39;</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">username</span> <span class="o">+</span> <span class="s">&quot;:&quot;</span> <span class="o">+</span> <span class="n">password</span>
+    <span class="n">auth</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">encodestring</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;ascii&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;ascii&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="c">#saving to file</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&#39;auth info saved.&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>It's python 3 by the way. You need to switch convert string to bytes for encoding. And then convert it to string again :). The <code>get_feed</code> function below downloads the atom feed and returns it. Finally, <code>print_unread</code> function
+prints the unread mail count.</p>
+<div class="codehilite"><pre><span class="k">def</span> <span class="nf">get_feed</span><span class="p">():</span>
+    <span class="n">atom_url</span> <span class="o">=</span> <span class="s">&#39;https://mail.google.com/mail/feed/atom&#39;</span>
+    <span class="c">#read auth_string from file</span>
+    <span class="k">if</span> <span class="n">auth_string</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Account info couldn&#39;t be found. Use --setup.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;Authorization&#39;</span><span class="p">:</span><span class="s">&quot;Basic </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">auth_string</span><span class="p">}</span>
+    <span class="n">request</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">atom_url</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">headers</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">doc</span>
+<span class="k">def</span> <span class="nf">print_unread</span><span class="p">():</span>
+    <span class="n">count_tag</span> <span class="o">=</span> <span class="s">&#39;./{http://purl.org/atom/ns#}fullcount&#39;</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">get_feed</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">doc</span><span class="p">:</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+        <span class="n">unread</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">count_tag</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">unread</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;No mail&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%d</span><span class="s"> mail&quot;</span> <span class="o">%</span> <span class="n">unread</span><span class="p">)</span>
+</pre></div>
+
+
+<p>I originally write this script for xmobar. I didn't write the whole script here. It actually stores auth info and some other things in a config file. For example, it possible to define template for printing unread count. It also send notification if you got new mail. You can find full working script <a href="https://gist.github.com/4277340">here</a>.</p>
+  </div><!-- /.entry-content -->
+</section>
+  <footer id="contentinfo" class="body">
+    <address id="about" class="vcard body">
+      Rıdvan Örsvuran |
+             License:&nbsp;<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png" /></a>
+            <br />
+      Theme: <a href="https://github.com/rdno/pelican-theme-solar">Solar Theme</a>
+      | Icons: <a href="http://fortawesome.github.com/Font-Awesome/">Font Awesome</a> |
+      Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+      which takes great advantage of <a href="http://python.org">Python</a>.
+    </address><!-- /#about -->
+  </footer><!-- /#contentinfo -->
+</body>
+</html>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>a code blog</title><link href="http://rdno.github.com/" rel="alternate"></link><link href="http://rdno.github.com/feeds/all-tr.atom.xml" rel="self"></link><id>http://rdno.github.com/</id><updated>2013-03-04T14:06:00+02:00</updated><entry><title>Emacs'de formatlı zaman ekleme</title><link href="http://rdno.github.com/inserting-time-string-emacs-tr.html" rel="alternate"></link><updated>2013-03-04T14:06:00+02:00</updated><author><name>Rıdvan Örsvuran</name></author><id>tag:rdno.github.com,2013-03-04:inserting-time-string-emacs-tr.html</id><summary type="html">&lt;p&gt;Aşağıdaki fonksiyonu .emacs dosyanıza eklediğinizde
+&lt;code&gt;M-x insert-time&lt;/code&gt; kullanarak istediğiniz formatta tarih/saat bilgisini dosyanıza ekleyebilirsiniz.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt; &lt;span class="nv"&gt;insert-time&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+ &lt;span class="s"&gt;&amp;quot;Insert formatted time string&amp;quot;&lt;/span&gt;
+ &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;interactive&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+ &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;let&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nb"&gt;format&lt;/span&gt;
+        &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;read-from-minibuffer&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Format: &amp;quot;&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;%Y-%m-%d %H:%M&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;insert&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;format-time-string&lt;/span&gt;  &lt;span class="nb"&gt;format&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="emacs"></category><category term="elisp"></category></entry></feed>

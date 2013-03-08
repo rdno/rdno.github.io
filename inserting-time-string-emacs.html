@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+    <title>a code blog</title>
+    <link href="http://rdno.github.com/feeds/all.atom.xml"
+	type="application/atom+xml"
+	rel="alternate" title="a code blog Full Atom Feed" />
+            <link href="http://rdno.github.com/feeds/code.atom.xml"
+	type="application/atom+xml" rel="alternate"
+	title="a code blog Categories Atom Feed" />
+            <link rel="stylesheet" type="text/css"
+	href="./theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+  <header id="banner" class="body">
+    <h1><a href=".">a code blog</a></h1>
+      </header>
+  <section id="content" class="body">
+  <header>
+    <h2 class="entry-title">
+      <a href="inserting-time-string-emacs.html" rel="bookmark"
+         title="Permalink to Inserting formatted time string in Emacs">Inserting formatted time string in Emacs</a></h2>
+  </header>
+  <footer class="post-info">
+  <i class="icon-calendar"></i>
+  <time title="2013-03-04T14:06:00" class="published" datetime="2013-03-04T14:06:00">Mon 04 March 2013</time>
+    &nbsp;<i class="icon-folder-close"></i>
+  <a class="category"
+     title="in category code"
+     href="./category/code.html">
+    code
+  </a>
+      &nbsp;<i class="icon-tags"></i>
+    <a class="tag"
+     title="tagged emacs"
+     href="./tag/emacs.html">emacs</a>
+    <a class="tag"
+     title="tagged elisp"
+     href="./tag/elisp.html">elisp</a>
+          <a class="lang"
+     title="also available in tr" href="./inserting-time-string-emacs-tr.html"><i class="icon-flag"></i> tr</a>
+      </footer>  <div class="entry-content">
+    <p>If you add the function below to your .emacs file, by invoking <code>M-x insert-time</code> command you can insert the current time information to your document.</p>
+<div class="codehilite"><pre><span class="p">(</span><span class="nb">defun</span> <span class="nv">insert-time</span><span class="p">()</span>
+ <span class="s">&quot;Insert formatted time string&quot;</span>
+ <span class="p">(</span><span class="nv">interactive</span><span class="p">)</span>
+ <span class="p">(</span><span class="k">let</span> <span class="p">((</span><span class="nb">format</span>
+        <span class="p">(</span><span class="nv">read-from-minibuffer</span> <span class="s">&quot;Format: &quot;</span> <span class="s">&quot;%Y-%m-%d %H:%M&quot;</span><span class="p">)))</span>
+    <span class="p">(</span><span class="nv">insert</span> <span class="p">(</span><span class="nv">format-time-string</span>  <span class="nb">format</span><span class="p">)))</span>
+<span class="p">)</span>
+</pre></div>
+  </div><!-- /.entry-content -->
+</section>
+  <footer id="contentinfo" class="body">
+    <address id="about" class="vcard body">
+      Rıdvan Örsvuran |
+             License:&nbsp;<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png" /></a>
+            <br />
+      Theme: <a href="https://github.com/rdno/pelican-theme-solar">Solar Theme</a>
+      | Icons: <a href="http://fortawesome.github.com/Font-Awesome/">Font Awesome</a> |
+      Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+      which takes great advantage of <a href="http://python.org">Python</a>.
+    </address><!-- /#about -->
+  </footer><!-- /#contentinfo -->
+</body>
+</html>
