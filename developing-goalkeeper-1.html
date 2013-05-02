@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+    <title>a code blog</title>
+    <link href="http://rdno.github.com/feeds/all.atom.xml"
+	type="application/atom+xml"
+	rel="alternate" title="a code blog Full Atom Feed" />
+            <link href="http://rdno.github.com/feeds/code.atom.xml"
+	type="application/atom+xml" rel="alternate"
+	title="a code blog Categories Atom Feed" />
+            <link rel="stylesheet" type="text/css"
+	href="./theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+  <header id="banner" class="body">
+    <h1><a href=".">a code blog</a></h1>
+      </header>
+  <section id="content" class="body">
+  <header>
+    <h2 class="entry-title">
+      <a href="developing-goalkeeper-1.html" rel="bookmark"
+         title="Permalink to Developing an Android Goal Tracker App - 1">Developing an Android Goal Tracker App - 1</a></h2>
+  </header>
+  <footer class="post-info">
+  <i class="icon-calendar"></i>
+  <time title="2013-05-02T19:21:00" class="published" datetime="2013-05-02T19:21:00">Thu 02 May 2013</time>
+    &nbsp;<i class="icon-folder-close"></i>
+  <a class="category"
+     title="in category code"
+     href="./category/code.html">
+    code
+  </a>
+      &nbsp;<i class="icon-tags"></i>
+    <a class="tag"
+     title="tagged java"
+     href="./tag/java.html">java</a>
+    <a class="tag"
+     title="tagged android"
+     href="./tag/android.html">android</a>
+    <a class="tag"
+     title="tagged goalkeeper"
+     href="./tag/goalkeeper.html">goalkeeper</a>
+        </footer>  <div class="entry-content">
+    <p>There are many goal tracker apps in Google Play Store. I tried a couple of them. But none of them has all of the features i wanted. So, I decided to start developing one myself. It will be licensed under GPL and I'll try to blog about steps i'm going to take. App's code name is <em>GoalKeeper</em>.</p>
+<p>First, I'm going to implement small subset of features. Only goal type allowed will be daily. It'll keep track daily streak and total number of tasks done. It'll notify user at a certain time to update the goal status. Goals will be listed as a simple list.</p>
+<p>But before that let's setup basic project structure. I'm using <a href="https://github.com/Prototik/HoloEverywhere" title="HoloEveryWhere">HoloEverywhere</a> to use <em>holo theme</em> in earlier versions of android. After cloning the repo, you should the replace <code>contrib/ActionBarSherlock/library/libs/android-support-v4.jar</code> with the one your project uses. And then, you can include <em>HoloEverywhere</em> library in your project.</p>
+<p>Our main activity (<code>GoalListActivity</code>) will be a <code>ListActivity</code>. But instead of native android one we will use <code>org.holoeverywhere.app.ListActivity</code>.</p>
+<p>Goal Add button will be in the action bar. First we will create a menu xml file for that.</p>
+<div class="codehilite"><pre><span class="c">&lt;!-- main.xml --&gt;</span>
+<span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span>
+<span class="nt">&lt;menu</span> <span class="na">xmlns:android=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;item</span> <span class="na">android:id=</span><span class="s">&quot;@+id/menu_add&quot;</span>
+      <span class="na">android:icon=</span><span class="s">&quot;@drawable/ic_action_add&quot;</span>
+      <span class="na">android:title=</span><span class="s">&quot;@string/menu_add&quot;</span>
+      <span class="na">android:showAsAction=</span><span class="s">&quot;ifRoom|withText&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/menu&gt;</span>
+</pre></div>
+
+
+<p>And in the <code>GoalListActivity</code></p>
+<div class="codehilite"><pre><span class="c1">// GoalListActivity.java</span>
+<span class="kn">import</span> <span class="nn">com.actionbarsherlock.view.Menu</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.actionbarsherlock.view.MenuInflater</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.actionbarsherlock.view.MenuItem</span><span class="o">;</span>
+
+<span class="c1">// ...</span>
+
+<span class="nd">@Override</span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">onCreateOptionsMenu</span><span class="o">(</span><span class="n">Menu</span> <span class="n">menu</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">MenuInflater</span> <span class="n">inflater</span> <span class="o">=</span> <span class="n">getSupportMenuInflater</span><span class="o">();</span>
+    <span class="n">inflater</span><span class="o">.</span><span class="na">inflate</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">menu</span><span class="o">.</span><span class="na">main</span><span class="o">,</span> <span class="n">menu</span><span class="o">);</span>
+    <span class="k">return</span> <span class="kd">super</span><span class="o">.</span><span class="na">onCreateOptionsMenu</span><span class="o">(</span><span class="n">menu</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="nd">@Override</span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">onOptionsItemSelected</span><span class="o">(</span><span class="n">MenuItem</span> <span class="n">item</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">switch</span> <span class="o">(</span><span class="n">item</span><span class="o">.</span><span class="na">getItemId</span><span class="o">())</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">menu_add</span><span class="o">:</span>
+        <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Intent</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">GoalAddActivity</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="n">startActivity</span><span class="o">(</span><span class="n">intent</span><span class="o">);</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="k">default</span><span class="o">:</span>
+        <span class="k">return</span> <span class="kd">super</span><span class="o">.</span><span class="na">onOptionsItemSelected</span><span class="o">(</span><span class="n">item</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p><code>GoalAddActivity</code> includes a EditText and a button for now. To enable up button (little arrow on the left of the app icon) we will add this code.</p>
+<div class="codehilite"><pre><span class="c1">// GoalAddActivity.java</span>
+<span class="nd">@Override</span>
+<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// ...</span>
+    <span class="n">getSupportActionBar</span><span class="o">().</span><span class="na">setDisplayHomeAsUpEnabled</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="nd">@Override</span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">onOptionsItemSelected</span><span class="o">(</span><span class="n">MenuItem</span> <span class="n">item</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">switch</span> <span class="o">(</span><span class="n">item</span><span class="o">.</span><span class="na">getItemId</span><span class="o">())</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="n">android</span><span class="o">.</span><span class="na">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">home</span><span class="o">:</span>
+        <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Intent</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">GoalListActivity</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="n">intent</span><span class="o">.</span><span class="na">addFlags</span><span class="o">(</span><span class="n">Intent</span><span class="o">.</span><span class="na">FLAG_ACTIVITY_CLEAR_TOP</span><span class="o">);</span>
+        <span class="n">startActivity</span><span class="o">(</span><span class="n">intent</span><span class="o">);</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="k">default</span><span class="o">:</span>
+        <span class="k">return</span> <span class="kd">super</span><span class="o">.</span><span class="na">onOptionsItemSelected</span><span class="o">(</span><span class="n">item</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<p>I will stop here. A dummy UI is ready now. You find the code at this stage at <a href="https://github.com/rdno/goalkeeper/tree/step1" title="github repo tag step1">github</a>.</p>
+  </div><!-- /.entry-content -->
+</section>
+  <footer id="contentinfo" class="body">
+    <address id="about" class="vcard body">
+      Rıdvan Örsvuran |
+             License:&nbsp;<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png" /></a>
+            <br />
+      Theme: <a href="https://github.com/rdno/pelican-theme-solar">Solar Theme</a>
+      | Icons: <a href="http://fortawesome.github.com/Font-Awesome/">Font Awesome</a> |
+      Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+      which takes great advantage of <a href="http://python.org">Python</a>.
+    </address><!-- /#about -->
+  </footer><!-- /#contentinfo -->
+</body>
+</html>
